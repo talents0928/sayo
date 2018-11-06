@@ -37,6 +37,6 @@ cc.Class({
         cc.log('test start') ;
     },
     update (dt) {
-        cc.log(dt) ;
+        // cc.log(dt) ;
     },
 });
