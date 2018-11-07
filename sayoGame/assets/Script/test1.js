@@ -27,6 +27,7 @@ cc.Class({
         //         this._bar = value;
         //     }
         // },
+        particleNode : cc.Node ,
     },
 
     // LIFE-CYCLE CALLBACKS:
@@ -34,7 +35,10 @@ cc.Class({
     // onLoad () {},
 
     start () {
-        cc.log('test start') ;
+        var particle = this.particleNode.getComponent('cc.ParticleSystem ') ;
+        window.node = this.particleNode ;
+        window.pt = particle ;
+        cc.log('normal') ;
     },
     update (dt) {
         // cc.log(dt) ;
