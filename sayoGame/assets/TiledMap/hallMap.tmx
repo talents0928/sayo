@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.1" orientation="orthogonal" renderorder="left-up" width="20" height="20" tilewidth="36" tileheight="36" infinite="0" nextlayerid="4" nextobjectid="10">
+ <tileset firstgid="1" name="mapBlock" tilewidth="32" tileheight="32" spacing="1" margin="1" tilecount="48" columns="8">
+  <image source="mapBlock.png" width="265" height="199"/>
+ </tileset>
+ <layer id="1" name="block" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJyTY2BgkBvFo3gUj+JRPIpJxADoji7h
+  </data>
+ </layer>
+ <layer id="3" name="block2" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFXAQwOeaRI0cP8wipp6Z55IQfNvXY4oLY+MFlHi4xaptHDqCFedRI16NgFKADAMJbAYc=
+  </data>
+ </layer>
+ <objectgroup id="2" name="object1">
+  <object id="8" name="target1" gid="39" x="109" y="541" width="32" height="32"/>
+  <object id="9" name="target2" gid="1073741855" x="574" y="73" width="35" height="35" rotation="180"/>
+ </objectgroup>
+</map>
