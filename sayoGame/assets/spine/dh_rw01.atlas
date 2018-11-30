@@ -1,0 +1,47 @@
+
+dh_rw01.png
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+pic_hall_rwj
+  rotate: false
+  xy: 0, 0
+  size: 5, 6
+  orig: 5, 6
+  offset: 0, 0
+  index: -1
+pic_hall_rwj02
+  rotate: false
+  xy: 125, 20
+  size: 5, 6
+  orig: 5, 6
+  offset: 0, 0
+  index: -1
+pic_hall_rws
+  rotate: true
+  xy: 89, 14
+  size: 12, 34
+  orig: 12, 34
+  offset: 0, 0
+  index: -1
+pic_hall_rws02
+  rotate: false
+  xy: 178, 87
+  size: 12, 34
+  orig: 12, 34
+  offset: 0, 0
+  index: -1
+pic_hall_rwsz
+  rotate: false
+  xy: 89, 28
+  size: 87, 93
+  orig: 87, 93
+  offset: 0, 0
+  index: -1
+pic_hall_rwt
+  rotate: false
+  xy: 0, 8
+  size: 87, 113
+  orig: 87, 113
+  offset: 0, 0
+  index: -1
