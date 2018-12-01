@@ -51,7 +51,7 @@ var Fingers = {
     touchs  : {} ,
     receive : function(touch){
         var fg = this.touchs[touch._id] || (new Finger(touch)) ;
-        this.touchs[fg._id] = fg ;
+        this.touchs[fg.id] = fg ;
         return fg.receive(touch) ;
     },
     clear : function(touch){
@@ -126,12 +126,7 @@ cc.Class({
         evt.setUserData(evt);
         this.node.dispatchEvent(evt);
     },
-    follow : function(evt){
-        var p = evt.touch._point ;
-        var sp = evt.touch._startPoint ;
-        this.node.x = this.originPos.x + p.x - sp.x ;
-        this.node.y = this.originPos.y + p.y - sp.y ;
-    } ,
+    
 
     // update (dt) {},
 });
