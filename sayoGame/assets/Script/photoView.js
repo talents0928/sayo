@@ -8,9 +8,41 @@
 //  - [Chinese] http://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
 //  - [English] http://www.cocos2d-x.org/docs/creator/en/scripting/life-cycle-callbacks.html
 
-
-function Finger(touch){
+function DoubleFinger(){
     this.alter = 4 ;
+    this.count = 0 ;
+    this.time = Date.now() ;
+};
+DoubleFinger.prototype = {
+    getSize : function(touchs){
+        var dx = touchs[1]._point.x - touchs[0]._point.x ;
+        var dy = touchs[1]._point.y - touchs[0]._point.y ;
+        var size = Math.sqrt(dx*dx+dy*dy) ;
+        return size ;
+    },
+    receive : function(touchs){
+        this.count ++ ;
+        if(this.count < this.alter){
+            return false ;
+        }
+        this.count = 0 ;
+        var t = touchs[0] ;
+        var size = this.getSize(touchs) ;
+        // 超时重置状态
+        if(t._lastModified-this.time > 100){
+            this.time = t._lastModified ;
+            this.size = size ;
+            return false ;
+        }
+        this.time = t._lastModified ; // 更新时间
+        var scale = size / this.size ;
+        this.size = size ; // 更新长度
+        return scale ;
+        
+    }
+};
+function Finger(touch){
+    this.alter = 3 ;
     this.init(touch) ;
 }
 Finger.prototype = {
@@ -45,14 +77,20 @@ Finger.prototype = {
         return false ;
     }
 
-}
+};
+
 
 var Fingers = {
     touchs  : {} ,
+    df : new DoubleFinger() ,
     receive : function(touch){
         var fg = this.touchs[touch._id] || (new Finger(touch)) ;
         this.touchs[fg.id] = fg ;
         return fg.receive(touch) ;
+    },
+    receiveDouble : function(touchs){
+        var scale = this.df.receive(touchs) ;
+        return scale ;
     },
     clear : function(touch){
         this.touchs[touch._id] = null ;
@@ -91,6 +129,8 @@ cc.Class({
         this.node.on(EventType.TOUCH_MOVE,this.moveHandler,this) ;
         this.node.on(EventType.TOUCH_END,this.endHandler,this) ;
         this.node.on(EventType.TOUCH_CANCEL,this.endHandler,this) ;
+
+        window.widget = this.node.getComponent(cc.Widget) ;
     },
     startHandler : function(evt){
         // cc.log(evt) ;
@@ -105,7 +145,15 @@ cc.Class({
         }
     },
     doubleFinger : function(evt){
-
+        var result = Fingers.receiveDouble(evt._touches) ;
+        hint.pop(result) ;
+        if(result){
+            var widget = this.node.getComponent(cc.Widget) ;
+            widget.enabled = true ;
+            this.node.anchorX = 0 ;
+            this.node.anchorY = 1 ;
+            this.node.scale *= result ;
+        }
     },
     singleFinger : function(evt){
         var result = Fingers.receive(evt._touches[0]) ;
