@@ -130,7 +130,6 @@ cc.Class({
         this.node.on(EventType.TOUCH_END,this.endHandler,this) ;
         this.node.on(EventType.TOUCH_CANCEL,this.endHandler,this) ;
 
-        window.widget = this.node.getComponent(cc.Widget) ;
     },
     startHandler : function(evt){
         // cc.log(evt) ;
@@ -148,12 +147,16 @@ cc.Class({
         var result = Fingers.receiveDouble(evt._touches) ;
         hint.pop(result) ;
         if(result){
-            var widget = this.node.getComponent(cc.Widget) ;
-            widget.enabled = true ;
-            this.node.anchorX = 0 ;
-            this.node.anchorY = 1 ;
+            this.upAnchor(0,1) ;
             this.node.scale *= result ;
         }
+    },
+    upAnchor : function(nX,nY){
+        var node = this ;
+        node.x += node.x*(nX-node.anchorX) ;
+        node.y += node.y*(nY-node.anchorY) ;
+        node.anchorX = nX ;
+        node.anchorY = nY ;
     },
     singleFinger : function(evt){
         var result = Fingers.receive(evt._touches[0]) ;
