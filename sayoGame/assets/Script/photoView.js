@@ -11,14 +11,21 @@
 function DoubleFinger(){
     this.alter = 4 ;
     this.count = 0 ;
-    this.time = Date.now() ;
+    this.timeStamp = Date.now() ;
 };
 DoubleFinger.prototype = {
-    getSize : function(touchs){
+    getInfo : function(touchs){
         var dx = touchs[1]._point.x - touchs[0]._point.x ;
         var dy = touchs[1]._point.y - touchs[0]._point.y ;
+        var ax = (touchs[0]._point.x + touchs[1]._point.x) / 2 ;
+        var ay = (touchs[0]._point.y + touchs[1]._point.y) / 2 ;
         var size = Math.sqrt(dx*dx+dy*dy) ;
-        return size ;
+        return {
+            timeStamp : touchs[0]._lastModified ,
+            size : size ,
+            ax : ax ,
+            ay : ay 
+        } ;
     },
     receive : function(touchs){
         this.count ++ ;
@@ -26,19 +33,22 @@ DoubleFinger.prototype = {
             return false ;
         }
         this.count = 0 ;
-        var t = touchs[0] ;
-        var size = this.getSize(touchs) ;
+        // var size = this.getSize(touchs) ;
+        var info = this.getInfo(touchs) ;
         // 超时重置状态
-        if(t._lastModified-this.time > 100){
-            this.time = t._lastModified ;
-            this.size = size ;
+        if(info.timeStamp - this.timeStamp > 100){
+            this.timeStamp = info.timeStamp  ;
+            this.size = info.size ;
             return false ;
         }
-        this.time = t._lastModified ; // 更新时间
-        var scale = size / this.size ;
-        this.size = size ; // 更新长度
-        return scale ;
-        
+        this.timeStamp = info.timeStamp  ; // 更新时间
+        var scale = info.size / this.size ;
+        this.size = info.size ; // 更新长度
+        return {
+            scale : scale ,
+            ax : info.ax ,
+            ay : info.ay 
+        } ;
     }
 };
 function Finger(touch){
@@ -89,8 +99,8 @@ var Fingers = {
         return fg.receive(touch) ;
     },
     receiveDouble : function(touchs){
-        var scale = this.df.receive(touchs) ;
-        return scale ;
+        var result = this.df.receive(touchs) ;
+        return result ;
     },
     clear : function(touch){
         this.touchs[touch._id] = null ;
@@ -116,14 +126,17 @@ cc.Class({
         //         this._bar = value;
         //     }
         // },
+        redPointpf : cc.Prefab ,
     },
 
     // LIFE-CYCLE CALLBACKS:
 
-    // onLoad () {},
+    onLoad () {
+        this.MaxScale = 1.5 ;
+        this.MinScale = 0.692 ;
+    },
 
     start () {
-        this.doubleCount = this.singleCount = 0 ;
         var EventType = cc.Node.EventType ;
         this.node.on(EventType.TOUCH_START,this.startHandler,this) ;
         this.node.on(EventType.TOUCH_MOVE,this.moveHandler,this) ;
@@ -132,11 +145,9 @@ cc.Class({
 
     },
     startHandler : function(evt){
-        // cc.log(evt) ;
-        // uiMgr.popHint(evt._touches.length) ;
+        // uiMgr.popHint(this.node.scale) ;
     },
     moveHandler : function(evt){
-        // uiMgr.popHint('move:'+evt._touches.length) ;
         if(evt._touches.length == 1){
             this.singleFinger(evt) ;
         }else if(evt._touches.length == 2){
@@ -145,19 +156,52 @@ cc.Class({
     },
     doubleFinger : function(evt){
         var result = Fingers.receiveDouble(evt._touches) ;
-        hint.pop(result) ;
+        // uiMgr.popHint(result) ;
         if(result){
-            this.upAnchor(0,1) ;
-            this.node.scale *= result ;
+            // this.upAnchor(result.ax,result.ay) ;
+            var scale = this.node.scale * result.scale ;
+            if(scale<=this.MaxScale && scale>=this.MinScale){
+                this.node.scale = scale ;
+            }
         }
     },
-    upAnchor : function(nX,nY){
-        var node = this ;
-        node.x += node.x*(nX-node.anchorX) ;
-        node.y += node.y*(nY-node.anchorY) ;
-        node.anchorX = nX ;
-        node.anchorY = nY ;
+    upAnchor : function(ax,ay){
+        var vec2 = this.node.parent.convertToNodeSpaceAR(cc.v2(ax,ay)) ; 
+        // this.addRed(vec2);
+        var node = this.node ;
+
+        return false ;
+
+        vec2.x /= node.scaleX ;
+        vec2.y /= node.scaleY ;
+        var offX = vec2.x - node.x ;
+        var offY = vec2.y - node.y ;
+        node.x = vec2.x ;
+        node.y = vec2.y ;
+        node.anchorX = offX/node.width + node.anchorX ;
+        node.anchorY = offY/node.height + node.anchorY ;
+        uiMgr.popHint(node.anchorY) ;
+        
     },
+    setAnchor : function(anchorX,anchorY){
+        var node = this.node ;
+        node.x += (anchorX - node.anchorX)*node.width*node.scaleX ;
+        node.y += (anchorY - node.anchorY)*node.height*node.scaleY ;
+        node.anchorX = anchorX ;
+        node.anchorY = anchorY ;
+    },
+    addRed : function(vec2){
+        var point = cc.instantiate(this.redPointpf) ;
+        this.node.parent.addChild(point) ;
+        point.position = vec2 ;
+    },
+    // upAnchor : function(nX,nY){
+    //     var node = this ;
+    //     node.x += node.x*(nX-node.anchorX) ;
+    //     node.y += node.y*(nY-node.anchorY) ;
+    //     node.anchorX = nX ;
+    //     node.anchorY = nY ;
+    // },
     singleFinger : function(evt){
         var result = Fingers.receive(evt._touches[0]) ;
         if(result){
@@ -167,17 +211,9 @@ cc.Class({
     },
     endHandler : function(evt){
         // cc.log(evt) ;
-        // FIXME  简单设定为0
-        this.doubleCount = this.singleCount = 0 ;
     },
 
 
-    dispatchEvent : function(type,evt){
-        var evt = new cc.Event.EventCustom(type, true);
-        evt.setUserData(evt);
-        this.node.dispatchEvent(evt);
-    },
-    
 
     // update (dt) {},
 });
