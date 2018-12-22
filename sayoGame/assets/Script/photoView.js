@@ -203,6 +203,9 @@ cc.Class({
     //     node.anchorY = nY ;
     // },
     singleFinger : function(evt){
+        var delta = evt.getDelta() ;
+        camera.node.position = cc.pSub(camera.node.position,delta) ;
+        return ;
         var result = Fingers.receive(evt._touches[0]) ;
         if(result){
             this.node.x += result.dx ;

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.1" orientation="isometric" renderorder="right-down" width="9" height="9" tilewidth="100" tileheight="50" infinite="0" nextlayerid="2" nextobjectid="1">
+ <tileset firstgid="1" name="tilde1" tilewidth="100" tileheight="100" spacing="1" margin="1" tilecount="4" columns="2">
+  <tileoffset x="0" y="15"/>
+  <image source="tile_iso_offset.png" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="5" name="tiled2" tilewidth="100" tileheight="100" spacing="1" margin="1" tilecount="4" columns="2">
+  <image source="tile_iso_offset.png" width="256" height="256"/>
+ </tileset>
+ <layer id="1" name="baseLayer" width="9" height="9">
+  <data encoding="base64" compression="zlib">
+   eJydjzEKADAIA7O08f8vrotwlHSpcKAhSrSkatzsBwVGY91+A8E/GveNnrsraJylfJ95+FPKmfjxHQbbAZI=
+  </data>
+ </layer>
+</map>
